@@ -7,7 +7,7 @@ terraform {
   }
 }
 
-# configure the aws provider
+# configure the aws provider. Plugins are called providers.
 provider "aws" {
   shared_config_files      = ["~/.aws/config"]
   shared_credentials_files = ["~/.aws/credentials"]
@@ -16,7 +16,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "app_server" {
-  ami           = "ami-830c94e3"
+  ami           = "ami-08d70e59c07c61a3a"
   instance_type = "t2.micro"
 
   tags = {
