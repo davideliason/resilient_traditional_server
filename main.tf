@@ -59,9 +59,6 @@ resource "aws_route_table_association" "pub-subnet-1-rt-assoc" {
 
 }
 
-
-
-
 # Security group for our production web server
 resource "aws_security_group" "web-sg" {
   vpc_id = aws_vpc.main-vpc.id
@@ -102,7 +99,6 @@ resource "aws_instance" "prd-web-server" {
   availability_zone           = "us-west-2a"
   associate_public_ip_address = true
 
-
   user_data = <<EOF
 
   #!/bin/bash
@@ -122,9 +118,7 @@ sudo systemctl enable httpd
 # Create a simple HTML page
 echo "<html><head><title><h3>Hellow world!</h3><i> Bring coffee please</i></title></head><body><h1>Hello from Apache!</h1></body></html>" > /var/www/html/index.html 
 
-
-
-  EOF
+EOF
 
   tags = var.resource_tags
 }
