@@ -91,11 +91,11 @@ resource "aws_security_group" "web-sg" {
 
 # create t2.micro ec2 instance for development web server in us-west-2a
 resource "aws_instance" "prd-web-server" {
-  ami                         = "ami-07d9cf938edb0739b"
+  ami                         = var.instance_ami
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.pub-subnet-1.id
   vpc_security_group_ids      = [aws_security_group.web-sg.id]
-  key_name                    = "best_dir"
+  key_name                    = var.key_name
   availability_zone           = "us-west-2a"
   associate_public_ip_address = true
 

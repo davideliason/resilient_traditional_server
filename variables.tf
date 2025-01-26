@@ -25,3 +25,15 @@ variable "availability_zones" {
   type        = list(string)
   default     = ["us-west-2a", "us-west-2b"]
 }
+
+variable "instance_ami" {
+  description = "AMI for the EC2 instance"
+  type        = string
+  default     = "ami-07d9cf938edb0739b"
+}
+
+variable "key_name" {
+  description = "Name of the SSH key pair to use"
+  type        = string
+  default     = "best_dir"
+}
