@@ -116,7 +116,7 @@ sudo systemctl start httpd
 sudo systemctl enable httpd 
 
 # Create a simple HTML page
-echo "<html><head><title><h3>Hellow world!</h3><i> Bring coffee please</i></title></head><body><h1>Hello from Apache!</h1></body></html>" > /var/www/html/index.html 
+echo "<html><head><title>Hello world!</title></head><body><h3> Bring coffee please</h3></body></html>" > /var/www/html/index.html 
 
 EOF
 
