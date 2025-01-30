@@ -103,4 +103,48 @@ resource "aws_instance" "prd-web-server" {
   tags      = var.resource_tags
 }
 
+# create load balancer
+resource "aws_lb" "main-lb" {
+  name               = "main-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.web-sg.id]
+  subnets            = [aws_subnet.pub-subnet-1.id]
+
+  tags = var.resource_tags
+}
+
+# create target group
+resource "aws_lb_target_group" "main-tg" {
+  name     = "main-tg"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main-vpc.id
+
+  tags = var.resource_tags
+}
+
+
+resource "aws_launch_template" "example" {
+  name_prefix         = "example-launch-template"
+  version_description = "v1"
+
+  # Instance type, AMI, and other configurations
+  instance_type = "t2.micro"
+
+  # You can also define an AMI ID. For example:
+  image_id = var.instance_ami
+
+  # Key pair for SSH access
+  key_name = "best_dir" # Replace with your key pair name
+
+  # Network interfaces and security groups
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.web-sg.id]
+  }
+
+  # User Data (optional)
+  user_data = base64encode("#!/bin/bash\nyum update -y")
+}
 
