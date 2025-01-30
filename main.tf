@@ -40,6 +40,14 @@ resource "aws_subnet" "pub-subnet-1" {
   tags = var.resource_tags
 }
 
+resource "aws_subnet" "pub-subnet-2" {
+  vpc_id            = aws_vpc.main-vpc.id
+  cidr_block        = var.pub_subnet_cidr_blocks[1]
+  availability_zone = var.availability_zones[1]
+
+  tags = var.resource_tags
+}
+
 # create route table
 resource "aws_route_table" "main-rt" {
   vpc_id = aws_vpc.main-vpc.id
@@ -56,7 +64,11 @@ resource "aws_route_table" "main-rt" {
 resource "aws_route_table_association" "pub-subnet-1-rt-assoc" {
   subnet_id      = aws_subnet.pub-subnet-1.id
   route_table_id = aws_route_table.main-rt.id
+}
 
+resource "aws_route_table_association" "pub-subnet-2-rt-assoc" {
+  subnet_id      = aws_subnet.pub-subnet-2.id
+  route_table_id = aws_route_table.main-rt.id
 }
 
 # Security group for our production web server
@@ -103,16 +115,6 @@ resource "aws_instance" "prd-web-server" {
   tags      = var.resource_tags
 }
 
-# create load balancer
-resource "aws_lb" "main-lb" {
-  name               = "main-lb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.web-sg.id]
-  subnets            = [aws_subnet.pub-subnet-1.id]
-
-  tags = var.resource_tags
-}
 
 # create target group
 resource "aws_lb_target_group" "main-tg" {
@@ -124,10 +126,20 @@ resource "aws_lb_target_group" "main-tg" {
   tags = var.resource_tags
 }
 
+# create load balancer
+resource "aws_lb" "main-lb" {
+  name               = "main-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.web-sg.id]
+  subnets            = [aws_subnet.pub-subnet-1.id, aws_subnet.pub-subnet-2.id]
+
+  tags = var.resource_tags
+}
+
 
 resource "aws_launch_template" "example" {
-  name_prefix         = "example-launch-template"
-  version_description = "v1"
+  name_prefix = "example-launch-template"
 
   # Instance type, AMI, and other configurations
   instance_type = "t2.micro"
@@ -142,9 +154,21 @@ resource "aws_launch_template" "example" {
   network_interfaces {
     associate_public_ip_address = true
     security_groups             = [aws_security_group.web-sg.id]
+    subnet_id                   = aws_subnet.pub-subnet-2.id
+
   }
+
+
 
   # User Data (optional)
   user_data = base64encode("#!/bin/bash\nyum update -y")
+}
+
+# launch ec2 instance using launch template
+resource "aws_instance" "example" {
+  launch_template {
+    id      = aws_launch_template.example.id
+    version = "$Latest"
+  }
 }
 
