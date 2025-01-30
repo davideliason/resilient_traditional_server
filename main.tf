@@ -99,28 +99,8 @@ resource "aws_instance" "prd-web-server" {
   availability_zone           = "us-west-2a"
   associate_public_ip_address = true
 
-  user_data = <<EOF
-
-  #!/bin/bash
-
-# Update packages
-sudo yum update -y
-
-# Install Apache web server
-sudo yum install -y httpd 
-
-# Start Apache service
-sudo systemctl start httpd 
-
-# Enable Apache to start on boot 
-sudo systemctl enable httpd 
-
-# Create a simple HTML page
-echo "<html><head><title>Hello world!</title></head><body><h3> Bring coffee please</h3></body></html>" > /var/www/html/index.html 
-
-EOF
-
-  tags = var.resource_tags
+  user_data = file("${path.module}/simpleWeb.sh")
+  tags      = var.resource_tags
 }
 
 
